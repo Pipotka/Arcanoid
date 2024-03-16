@@ -306,7 +306,7 @@ namespace Arkanoid
             if (!isStartGame)
             {
                 isStartGame = true;
-                ball.XSpeedIncrease(1.0);
+                ball.XSpeedIncrease(0.5);
                 ball.YSpeedIncrease(5.0);
                 ball.SetStartDirection();
             }
