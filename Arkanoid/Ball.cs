@@ -33,14 +33,32 @@
         {
             Position.X += direction.X * (int)xSpeed;
             Position.Y += direction.Y * (int)ySpeed;
-            LeftSide.X = Position.X + 1;
+            LeftSide.X = Position.X;
             LeftSide.Y = Position.Y + height / 2;
-            RightSide.X = Position.X + width - 1;
+            RightSide.X = Position.X + width;
             RightSide.Y = Position.Y + height / 2;
-            TopSide.X = Position.X + width / 2 + 1;
+            TopSide.X = Position.X + width / 2;
             TopSide.Y = Position.Y;
             BottomSide.X = Position.X + width / 2;
-            BottomSide.Y = Position.Y + height - 1;
+            BottomSide.Y = Position.Y + height;
+        }
+
+        public void YMove(int offsetInYAxis)
+        {
+            Position.Y += offsetInYAxis;
+            LeftSide.Y = Position.Y + height / 2;
+            RightSide.Y = Position.Y + height / 2;
+            TopSide.Y = Position.Y;
+            BottomSide.Y = Position.Y + height;
+        }
+
+        public void XMove(int offsetInXAxis)
+        {
+            Position.X += offsetInXAxis;
+            LeftSide.X = Position.X;
+            RightSide.X = Position.X + width;
+            TopSide.X = Position.X + width / 2;
+            BottomSide.X = Position.X + width / 2;
         }
 
         public void SetStartDirection()

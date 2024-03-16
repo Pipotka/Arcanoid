@@ -1,4 +1,5 @@
 using System;
+using System.Data.Common;
 using System.Drawing;
 using System.Drawing.Text;
 
@@ -24,10 +25,8 @@ namespace Arkanoid
         private Point platformPosition;
         private int widthOfBall = Properties.Resources.Ball.Width;
         private int heightOfBall = Properties.Resources.Ball.Height;
-        private int numberOfCollisionsWithPlatformPerFrames = 0;
-        private int countFrames = 0;
         private Ball ball;
-        private Ball phantomBall;
+        //private Ball phantomBall;
         public Arkanoid()
         {
             InitializeComponent();
@@ -44,7 +43,6 @@ namespace Arkanoid
             platform = new Platform(startPositionOfPlatform, widthOfPlatform, heightOfPlatform);
             Point startPositionOfBall = new Point(startPositionOfPlatform.X + widthOfPlatform / 2 - widthOfBall / 2, startPositionOfPlatform.Y - heightOfBall);
             ball = new Ball(startPositionOfBall, heightOfBall, widthOfBall);
-            phantomBall = new Ball(startPositionOfBall, heightOfBall, widthOfBall);
             platformBitmap.MakeTransparent(Color.White);
             ballBitmap.MakeTransparent(Color.White);
             GameTimer.Start();
@@ -141,18 +139,12 @@ namespace Arkanoid
 
         private void GameTimerTick(object sender, EventArgs e)
         {
-            countFrames++;
             buffer.Graphics.DrawImage(backgroundBitmap, 0, 0);
             DrawGameRectangles();
             platform.Move(platformPosition);
             buffer.Graphics.DrawImage(platformBitmap, platform.Position);
             ChangingPositionOfBall(DetermineModeOfMotionOfBall());
             buffer.Graphics.DrawImage(ballBitmap, ball.Position);
-            if (countFrames == 10)
-            {
-                countFrames = 0;
-                numberOfCollisionsWithPlatformPerFrames = 0;
-            }
             buffer.Render();
         }
 
@@ -242,24 +234,60 @@ namespace Arkanoid
                         {
                             GameRectangles[row, column].IsVisible = false;
                             SetAvailabilityOfSurroundingRectangles(row, column);
+                            var isContainsInGameRectangle = false;
+                            while (!isContainsInGameRectangle)
+                            {
+                                ball.XMove(2);
+                                if (!GameRectangles[row, column].isContains(ball.LeftSide))
+                                {
+                                    isContainsInGameRectangle = true;
+                                }
+                            }
                             return ModsChangingPositionOfBall.Left—ollision;
                         }
                         else if (GameRectangles[row, column].isContains(ball.BottomSide))
                         {
                             GameRectangles[row, column].IsVisible = false;
                             SetAvailabilityOfSurroundingRectangles(row, column);
+                            var isContainsInGameRectangle = false;
+                            while (!isContainsInGameRectangle)
+                            {
+                                ball.YMove(-2);
+                                if (!GameRectangles[row, column].isContains(ball.BottomSide))
+                                {
+                                    isContainsInGameRectangle = true;
+                                }
+                            }
                             return ModsChangingPositionOfBall.Bottom—ollision;
                         }
                         else if (GameRectangles[row, column].isContains(ball.RightSide))
                         {
                             GameRectangles[row, column].IsVisible = false;
                             SetAvailabilityOfSurroundingRectangles(row, column);
+                            var isContainsInGameRectangle = false;
+                            while (!isContainsInGameRectangle)
+                            {
+                                ball.XMove(-2);
+                                if (!GameRectangles[row, column].isContains(ball.RightSide))
+                                {
+                                    isContainsInGameRectangle = true;
+                                }
+                            }
                             return ModsChangingPositionOfBall.Right—ollision;
                         }
                         else if (GameRectangles[row, column].isContains(ball.TopSide))
                         {
                             GameRectangles[row, column].IsVisible = false;
                             SetAvailabilityOfSurroundingRectangles(row, column);
+                            var isContainsInGameRectangle = false;
+                            while (!isContainsInGameRectangle)
+                            {
+                                ball.YMove(2);
+                                if (!GameRectangles[row, column].isContains(ball.TopSide))
+                                {
+                                    isContainsInGameRectangle = true;
+                                }
+                            }
                             return ModsChangingPositionOfBall.Top—ollision;
                         }
                     }
@@ -291,33 +319,62 @@ namespace Arkanoid
         private ModsChangingPositionOfBall DetermineIfBallHasCollidedWithPlatform()
         {
             var mod = new ModsChangingPositionOfBall();
-            if (numberOfCollisionsWithPlatformPerFrames == 0)
-            {
                 mod = platform.IdentifyPartOfPlatform(ball.LeftSide);
                 if (mod != ModsChangingPositionOfBall.None)
                 {
-                    numberOfCollisionsWithPlatformPerFrames++;
-                    return mod;
-                }
-                mod = platform.IdentifyPartOfPlatform(ball.BottomSide);
-                if (mod != ModsChangingPositionOfBall.None)
-                {
-                    numberOfCollisionsWithPlatformPerFrames++;
+                    var isContainsInGameRectangle = false;
+                    while (!isContainsInGameRectangle)
+                    {
+                        ball.XMove(2);
+                        if (platform.IdentifyPartOfPlatform(ball.LeftSide) == ModsChangingPositionOfBall.None)
+                        {
+                            isContainsInGameRectangle = true;
+                        }
+                    }
                     return mod;
                 }
                 mod = platform.IdentifyPartOfPlatform(ball.RightSide);
                 if (mod != ModsChangingPositionOfBall.None)
                 {
-                    numberOfCollisionsWithPlatformPerFrames++;
+                    var isContainsInGameRectangle = false;
+                    while (!isContainsInGameRectangle)
+                    {
+                        ball.XMove(-2);
+                        if (platform.IdentifyPartOfPlatform(ball.RightSide) == ModsChangingPositionOfBall.None)
+                        {
+                            isContainsInGameRectangle = true;
+                        }
+                    }
+                    return mod;
+                }
+                mod = platform.IdentifyPartOfPlatform(ball.BottomSide);
+                if (mod != ModsChangingPositionOfBall.None)
+                {
+                    var isContainsInGameRectangle = false;
+                    while (!isContainsInGameRectangle)
+                    {
+                        ball.YMove(-2);
+                        if (platform.IdentifyPartOfPlatform(ball.BottomSide) == ModsChangingPositionOfBall.None)
+                        {
+                            isContainsInGameRectangle = true;
+                        }
+                    }
                     return mod;
                 }
                 mod = platform.IdentifyPartOfPlatform(ball.TopSide);
                 if (mod != ModsChangingPositionOfBall.None)
                 {
-                    numberOfCollisionsWithPlatformPerFrames++;
+                    var isContainsInGameRectangle = false;
+                    while (!isContainsInGameRectangle)
+                    {
+                        ball.YMove(2);
+                        if (platform.IdentifyPartOfPlatform(ball.TopSide) == ModsChangingPositionOfBall.None)
+                        {
+                            isContainsInGameRectangle = true;
+                        }
+                    }
                     return mod;
                 }
-            }
             return ModsChangingPositionOfBall.None;
         }
         private void ArkanoidDoubleClick(object sender, EventArgs e)
@@ -326,7 +383,7 @@ namespace Arkanoid
             {
                 isStartGame = true;
                 ball.XSpeedIncrease(0.5);
-                ball.YSpeedIncrease(5.0);
+                ball.YSpeedIncrease(3.0);
                 ball.SetStartDirection();
             }
         }
