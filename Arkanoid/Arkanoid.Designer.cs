@@ -34,7 +34,7 @@
             // 
             // GameTimer
             // 
-            GameTimer.Interval = 10;
+            GameTimer.Interval = 5;
             GameTimer.Tick += GameTimerTick;
             // 
             // Arkanoid

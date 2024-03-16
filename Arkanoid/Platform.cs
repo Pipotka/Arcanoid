@@ -25,7 +25,8 @@ namespace Arkanoid
 
         public bool IsConsist(Point point)
         {
-            if (((point.X >= Position.X) && (point.X <= Position.X + Width)) && ((point.Y >= Position.Y) && (point.Y <= Position.Y + Height)))
+            if (((point.X >= Position.X) && (point.X <= Position.X + Width)) 
+                && ((point.Y >= Position.Y) && (point.Y <= Position.Y + Height)))
             {
                 return true;
             }
@@ -34,11 +35,13 @@ namespace Arkanoid
 
         public ModsChangingPositionOfBall IdentifyPartOfPlatform(Point point)
         {
-            if (((point.X >= Position.X) && (point.X <= Position.X + Width / 2)) && ((point.Y >= Position.Y) && (point.Y <= Position.Y + Height)))
+            if (((point.X >= Position.X) && (point.X <= Position.X + Width / 2)) 
+                && ((point.Y >= Position.Y) && (point.Y <= Position.Y + Height)))
             {
                 return ModsChangingPositionOfBall.LeftPartOfPlatform;
             }
-            else if (((point.X >= Position.X + Width / 2) && (point.X <= Position.X + Width)) && ((point.Y >= Position.Y) && (point.Y <= Position.Y + Height)))
+            else if (((point.X >= Position.X + Width / 2) && (point.X <= Position.X + Width)) 
+                && ((point.Y >= Position.Y) && (point.Y <= Position.Y + Height)))
             {
                 return ModsChangingPositionOfBall.RightPartOfPlatform;
             }
@@ -48,9 +51,9 @@ namespace Arkanoid
             }
         }
 
-        public void Move(Point newPosition)
+        public void Move(int xCoordinate)
         {
-            Position.X = newPosition.X - Width / 2;
+            Position.X = xCoordinate - Width / 2;
         }
     }
 }

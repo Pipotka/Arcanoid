@@ -13,8 +13,8 @@ namespace Arkanoid
         private Graphics canvas;
         private BufferedGraphicsContext currentBuffer;
         private BufferedGraphics buffer;
-        private int widthOfGameRectangle = 100;
-        private int heightOfGameRectangle = 30;
+        private int widthOfGameRectangle = 70;
+        private int heightOfGameRectangle = 20;
         private int widthOfPlatform = Properties.Resources.Platform.Width;
         private int heightOfPlatform = Properties.Resources.Platform.Height;
         private int columns;
@@ -25,33 +25,36 @@ namespace Arkanoid
         private Point platformPosition;
         private int widthOfBall = Properties.Resources.Ball.Width;
         private int heightOfBall = Properties.Resources.Ball.Height;
+        private int heightOfScreen = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height;
+        private int widthOfScreen = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width;
         private Ball ball;
-        //private Ball phantomBall;
         public Arkanoid()
         {
             InitializeComponent();
             canvas = CreateGraphics();
             currentBuffer = BufferedGraphicsManager.Current;
             buffer = currentBuffer.Allocate(this.CreateGraphics(), this.DisplayRectangle);
-            var temporaryColumns = 1920 / widthOfGameRectangle;
-            var temporaryLines = (1080 - heightOfGameRectangle * 20) / heightOfGameRectangle;
+            var temporaryColumns = widthOfScreen / widthOfGameRectangle;
+            var temporaryLines = (heightOfScreen - heightOfGameRectangle * 20) / heightOfGameRectangle;
             columns = temporaryColumns;
             rows = temporaryLines;
             GameRectangles = new GameRectangle[rows, columns];
             InitializationOfGameRectangles();
-            var startPositionOfPlatform = new Point(1080 - (heightOfGameRectangle * 3), 1920 / 2);
+            var startPositionOfPlatform = new Point(heightOfScreen - (heightOfGameRectangle * 3), widthOfScreen / 2);
             platform = new Platform(startPositionOfPlatform, widthOfPlatform, heightOfPlatform);
-            Point startPositionOfBall = new Point(startPositionOfPlatform.X + widthOfPlatform / 2 - widthOfBall / 2, startPositionOfPlatform.Y - heightOfBall);
+            Point startPositionOfBall = new Point(startPositionOfPlatform.X + widthOfPlatform / 2 - widthOfBall / 2,
+                startPositionOfPlatform.Y - heightOfBall);
             ball = new Ball(startPositionOfBall, heightOfBall, widthOfBall);
             platformBitmap.MakeTransparent(Color.White);
             ballBitmap.MakeTransparent(Color.White);
+            platformPosition = new Point(startPositionOfPlatform.X, startPositionOfPlatform.Y);
             GameTimer.Start();
         }
 
         private void InitializationOfGameRectangles()
         {
-            var offsetYCoordinateOfRectanglesLocation = 1080 % heightOfGameRectangle;
-            var offsetXCoordinateOfRectanglesLocation = 1920 % widthOfGameRectangle;
+            var offsetYCoordinateOfRectanglesLocation = heightOfScreen % heightOfGameRectangle;
+            var offsetXCoordinateOfRectanglesLocation = widthOfScreen % widthOfGameRectangle;
             int xCoordinateOfUpperLeftCornerOfGameRectangle = offsetXCoordinateOfRectanglesLocation / 2;
             int yCoordinateOfUpperLeftCornerOfGameRectangle = offsetYCoordinateOfRectanglesLocation / 2;
             var randomColorOfGameRectangle = new Random();
@@ -141,16 +144,16 @@ namespace Arkanoid
         {
             buffer.Graphics.DrawImage(backgroundBitmap, 0, 0);
             DrawGameRectangles();
-            platform.Move(platformPosition);
             buffer.Graphics.DrawImage(platformBitmap, platform.Position);
             ChangingPositionOfBall(DetermineModeOfMotionOfBall());
+            platform.Move(platformPosition.X);
             buffer.Graphics.DrawImage(ballBitmap, ball.Position);
             buffer.Render();
         }
 
         private void ArkanoidMouseMove(object sender, MouseEventArgs e)
         {
-            platformPosition = e.Location;
+            platformPosition.X = e.Location.X;
         }
 
         private void ChangingPositionOfBall(ModsChangingPositionOfBall mod)
@@ -162,29 +165,23 @@ namespace Arkanoid
             }
             if (mod == ModsChangingPositionOfBall.LeftÑollision)
             {
-                ball.SetOppositeDirectionX();
+                ball.SetPositiveDirectionX();
             }
             else if (mod == ModsChangingPositionOfBall.BottomÑollision)
             {
-                ball.SetOppositeDirectionY();
+                ball.SetNegativeDirectionY();
             }
             else if (mod == ModsChangingPositionOfBall.RightÑollision)
             {
-                ball.SetOppositeDirectionX();
+                ball.SetNegativeDirectionX();
             }
             else if (mod == ModsChangingPositionOfBall.TopÑollision)
             {
-                ball.SetOppositeDirectionY();
+                ball.SetPositiveDirectionY();
             }
-            if (mod == ModsChangingPositionOfBall.LeftPartOfPlatform)
+            if ((mod == ModsChangingPositionOfBall.LeftPartOfPlatform) || (mod == ModsChangingPositionOfBall.RightPartOfPlatform))
             {
-                ball.SetOppositeDirectionY();
-                ball.XSpeedIncrease(0.5);
-                ball.YSpeedIncrease(0.5);
-            }
-            else if (mod == ModsChangingPositionOfBall.RightPartOfPlatform)
-            {
-                ball.SetOppositeDirectionY();
+                ball.SetNegativeDirectionY();
                 ball.XSpeedIncrease(0.5);
                 ball.YSpeedIncrease(0.5);
             }
@@ -203,7 +200,7 @@ namespace Arkanoid
             {
                 return ModsChangingPositionOfBall.LeftÑollision;
             }
-            else if (ball.RightSide.X > 1920)
+            else if (ball.RightSide.X > widthOfScreen)
             {
                 return ModsChangingPositionOfBall.RightÑollision;
             }
@@ -211,7 +208,7 @@ namespace Arkanoid
             {
                 return ModsChangingPositionOfBall.TopÑollision;
             }
-            else if (ball.BottomSide.Y > 1920)
+            else if (ball.TopSide.Y > heightOfScreen)
             {
                 GameTimer.Stop();
                 MessageBox.Show("Âû ïðîèãðàëè",
@@ -318,63 +315,24 @@ namespace Arkanoid
 
         private ModsChangingPositionOfBall DetermineIfBallHasCollidedWithPlatform()
         {
-            var mod = new ModsChangingPositionOfBall();
-                mod = platform.IdentifyPartOfPlatform(ball.LeftSide);
-                if (mod != ModsChangingPositionOfBall.None)
-                {
-                    var isContainsInGameRectangle = false;
-                    while (!isContainsInGameRectangle)
-                    {
-                        ball.XMove(2);
-                        if (platform.IdentifyPartOfPlatform(ball.LeftSide) == ModsChangingPositionOfBall.None)
-                        {
-                            isContainsInGameRectangle = true;
-                        }
-                    }
-                    return mod;
-                }
-                mod = platform.IdentifyPartOfPlatform(ball.RightSide);
-                if (mod != ModsChangingPositionOfBall.None)
-                {
-                    var isContainsInGameRectangle = false;
-                    while (!isContainsInGameRectangle)
-                    {
-                        ball.XMove(-2);
-                        if (platform.IdentifyPartOfPlatform(ball.RightSide) == ModsChangingPositionOfBall.None)
-                        {
-                            isContainsInGameRectangle = true;
-                        }
-                    }
-                    return mod;
-                }
-                mod = platform.IdentifyPartOfPlatform(ball.BottomSide);
-                if (mod != ModsChangingPositionOfBall.None)
-                {
-                    var isContainsInGameRectangle = false;
-                    while (!isContainsInGameRectangle)
-                    {
-                        ball.YMove(-2);
-                        if (platform.IdentifyPartOfPlatform(ball.BottomSide) == ModsChangingPositionOfBall.None)
-                        {
-                            isContainsInGameRectangle = true;
-                        }
-                    }
-                    return mod;
-                }
-                mod = platform.IdentifyPartOfPlatform(ball.TopSide);
-                if (mod != ModsChangingPositionOfBall.None)
-                {
-                    var isContainsInGameRectangle = false;
-                    while (!isContainsInGameRectangle)
-                    {
-                        ball.YMove(2);
-                        if (platform.IdentifyPartOfPlatform(ball.TopSide) == ModsChangingPositionOfBall.None)
-                        {
-                            isContainsInGameRectangle = true;
-                        }
-                    }
-                    return mod;
-                }
+            if (platform.IdentifyPartOfPlatform(ball.LeftSide) != ModsChangingPositionOfBall.None)
+            {
+                ball.XSpeedIncrease(10);
+                return ModsChangingPositionOfBall.LeftÑollision;
+            }
+            if (platform.IdentifyPartOfPlatform(ball.RightSide) != ModsChangingPositionOfBall.None)
+            {
+                ball.XSpeedIncrease(10);
+                return ModsChangingPositionOfBall.RightÑollision;
+            }
+            if (platform.IdentifyPartOfPlatform(ball.BottomSide) != ModsChangingPositionOfBall.None)
+            {
+                return ModsChangingPositionOfBall.LeftPartOfPlatform;
+            }
+            if (platform.IdentifyPartOfPlatform(ball.TopSide) != ModsChangingPositionOfBall.None)
+            {
+                return ModsChangingPositionOfBall.TopÑollision;
+            }
             return ModsChangingPositionOfBall.None;
         }
         private void ArkanoidDoubleClick(object sender, EventArgs e)
@@ -383,7 +341,7 @@ namespace Arkanoid
             {
                 isStartGame = true;
                 ball.XSpeedIncrease(0.5);
-                ball.YSpeedIncrease(3.0);
+                ball.YSpeedIncrease(5.0);
                 ball.SetStartDirection();
             }
         }

@@ -68,14 +68,24 @@
             direction.Y = -1;
         }
 
-        public void SetOppositeDirectionX()
+        public void SetNegativeDirectionY()
         {
-            direction.X *= -1;
+            direction.Y = -1;
         }
 
-        public void SetOppositeDirectionY()
+        public void SetNegativeDirectionX()
         {
-            direction.Y *= -1;
+            direction.X = -1;
+        }
+
+        public void SetPositiveDirectionY()
+        {
+            direction.Y = 1;
+        }
+
+        public void SetPositiveDirectionX()
+        {
+            direction.X = 1;
         }
 
         public void XSpeedIncrease(double changeSpeedByX)
