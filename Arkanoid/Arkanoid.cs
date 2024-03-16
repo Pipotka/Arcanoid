@@ -21,11 +21,13 @@ namespace Arkanoid
         private bool isStartGame = false;
         private GameRectangle[,] GameRectangles;
         private Platform platform;
+        private Point platformPosition;
         private int widthOfBall = Properties.Resources.Ball.Width;
         private int heightOfBall = Properties.Resources.Ball.Height;
         private int numberOfCollisionsWithPlatformPerFrames = 0;
         private int countFrames = 0;
         private Ball ball;
+        private Ball phantomBall;
         public Arkanoid()
         {
             InitializeComponent();
@@ -42,6 +44,7 @@ namespace Arkanoid
             platform = new Platform(startPositionOfPlatform, widthOfPlatform, heightOfPlatform);
             Point startPositionOfBall = new Point(startPositionOfPlatform.X + widthOfPlatform / 2 - widthOfBall / 2, startPositionOfPlatform.Y - heightOfBall);
             ball = new Ball(startPositionOfBall, heightOfBall, widthOfBall);
+            phantomBall = new Ball(startPositionOfBall, heightOfBall, widthOfBall);
             platformBitmap.MakeTransparent(Color.White);
             ballBitmap.MakeTransparent(Color.White);
             GameTimer.Start();
@@ -141,6 +144,7 @@ namespace Arkanoid
             countFrames++;
             buffer.Graphics.DrawImage(backgroundBitmap, 0, 0);
             DrawGameRectangles();
+            platform.Move(platformPosition);
             buffer.Graphics.DrawImage(platformBitmap, platform.Position);
             ChangingPositionOfBall(DetermineModeOfMotionOfBall());
             buffer.Graphics.DrawImage(ballBitmap, ball.Position);
@@ -154,7 +158,7 @@ namespace Arkanoid
 
         private void ArkanoidMouseMove(object sender, MouseEventArgs e)
         {
-            platform.Move(e.Location);
+            platformPosition = e.Location;
         }
 
         private void ChangingPositionOfBall(ModsChangingPositionOfBall mod)
