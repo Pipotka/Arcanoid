@@ -12,6 +12,8 @@
         private Direction direction;
         private int height;
         private int width;
+        private const double maxSpeed = 30.0;
+        private const double minSpeed = 0.0;
 
         public Ball(Point position, int height, int width)
         {
@@ -60,26 +62,17 @@
 
         public void XSpeedIncrease(double changeSpeedByX)
         {
-            if (xSpeed + changeSpeedByX >= 0)
+            if ((xSpeed + changeSpeedByX >= minSpeed) && (xSpeed + changeSpeedByX <= maxSpeed))
             {
                 xSpeed += changeSpeedByX;
-
-            }
-            else
-            {
-                xSpeed = 0;
             }
         }
 
         public void YSpeedIncrease(double changeSpeedByY)
         {
-            if (ySpeed + changeSpeedByY >= 0)
+            if ((ySpeed + changeSpeedByY >= minSpeed) && (ySpeed + changeSpeedByY <= maxSpeed))
             {
                 ySpeed += changeSpeedByY;
-            }
-            else
-            {
-                ySpeed = 0;
             }
         }
     }

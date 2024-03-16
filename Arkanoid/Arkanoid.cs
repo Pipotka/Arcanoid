@@ -23,6 +23,8 @@ namespace Arkanoid
         private Platform platform;
         private int widthOfBall = Properties.Resources.Ball.Width;
         private int heightOfBall = Properties.Resources.Ball.Height;
+        private int numberOfCollisionsWithPlatformPerFrames = 0;
+        private int countFrames = 0;
         private Ball ball;
         public Arkanoid()
         {
@@ -136,11 +138,17 @@ namespace Arkanoid
 
         private void GameTimerTick(object sender, EventArgs e)
         {
+            countFrames++;
             buffer.Graphics.DrawImage(backgroundBitmap, 0, 0);
             DrawGameRectangles();
             buffer.Graphics.DrawImage(platformBitmap, platform.Position);
             ChangingPositionOfBall(DetermineModeOfMotionOfBall());
             buffer.Graphics.DrawImage(ballBitmap, ball.Position);
+            if (countFrames == 10)
+            {
+                countFrames = 0;
+                numberOfCollisionsWithPlatformPerFrames = 0;
+            }
             buffer.Render();
         }
 
@@ -279,25 +287,32 @@ namespace Arkanoid
         private ModsChangingPositionOfBall DetermineIfBallHasCollidedWithPlatform()
         {
             var mod = new ModsChangingPositionOfBall();
-            mod = platform.IdentifyPartOfPlatform(ball.LeftSide);
-            if (mod != ModsChangingPositionOfBall.None)
+            if (numberOfCollisionsWithPlatformPerFrames == 0)
             {
-                return mod;
-            }
-            mod = platform.IdentifyPartOfPlatform(ball.BottomSide);
-            if (mod != ModsChangingPositionOfBall.None)
-            {
-                return mod;
-            }
-            mod = platform.IdentifyPartOfPlatform(ball.RightSide);
-            if (mod != ModsChangingPositionOfBall.None)
-            {
-                return mod;
-            }
-            mod = platform.IdentifyPartOfPlatform(ball.TopSide);
-            if (mod != ModsChangingPositionOfBall.None)
-            {
-                return mod;
+                mod = platform.IdentifyPartOfPlatform(ball.LeftSide);
+                if (mod != ModsChangingPositionOfBall.None)
+                {
+                    numberOfCollisionsWithPlatformPerFrames++;
+                    return mod;
+                }
+                mod = platform.IdentifyPartOfPlatform(ball.BottomSide);
+                if (mod != ModsChangingPositionOfBall.None)
+                {
+                    numberOfCollisionsWithPlatformPerFrames++;
+                    return mod;
+                }
+                mod = platform.IdentifyPartOfPlatform(ball.RightSide);
+                if (mod != ModsChangingPositionOfBall.None)
+                {
+                    numberOfCollisionsWithPlatformPerFrames++;
+                    return mod;
+                }
+                mod = platform.IdentifyPartOfPlatform(ball.TopSide);
+                if (mod != ModsChangingPositionOfBall.None)
+                {
+                    numberOfCollisionsWithPlatformPerFrames++;
+                    return mod;
+                }
             }
             return ModsChangingPositionOfBall.None;
         }
