@@ -231,60 +231,24 @@ namespace Arkanoid
                         {
                             GameRectangles[row, column].IsVisible = false;
                             SetAvailabilityOfSurroundingRectangles(row, column);
-                            var isContainsInGameRectangle = false;
-                            while (!isContainsInGameRectangle)
-                            {
-                                ball.XMove(2);
-                                if (!GameRectangles[row, column].isContains(ball.LeftSide))
-                                {
-                                    isContainsInGameRectangle = true;
-                                }
-                            }
                             return ModsChangingPositionOfBall.Left—ollision;
                         }
                         else if (GameRectangles[row, column].isContains(ball.BottomSide))
                         {
                             GameRectangles[row, column].IsVisible = false;
                             SetAvailabilityOfSurroundingRectangles(row, column);
-                            var isContainsInGameRectangle = false;
-                            while (!isContainsInGameRectangle)
-                            {
-                                ball.YMove(-2);
-                                if (!GameRectangles[row, column].isContains(ball.BottomSide))
-                                {
-                                    isContainsInGameRectangle = true;
-                                }
-                            }
                             return ModsChangingPositionOfBall.Bottom—ollision;
                         }
                         else if (GameRectangles[row, column].isContains(ball.RightSide))
                         {
                             GameRectangles[row, column].IsVisible = false;
                             SetAvailabilityOfSurroundingRectangles(row, column);
-                            var isContainsInGameRectangle = false;
-                            while (!isContainsInGameRectangle)
-                            {
-                                ball.XMove(-2);
-                                if (!GameRectangles[row, column].isContains(ball.RightSide))
-                                {
-                                    isContainsInGameRectangle = true;
-                                }
-                            }
                             return ModsChangingPositionOfBall.Right—ollision;
                         }
                         else if (GameRectangles[row, column].isContains(ball.TopSide))
                         {
                             GameRectangles[row, column].IsVisible = false;
                             SetAvailabilityOfSurroundingRectangles(row, column);
-                            var isContainsInGameRectangle = false;
-                            while (!isContainsInGameRectangle)
-                            {
-                                ball.YMove(2);
-                                if (!GameRectangles[row, column].isContains(ball.TopSide))
-                                {
-                                    isContainsInGameRectangle = true;
-                                }
-                            }
                             return ModsChangingPositionOfBall.Top—ollision;
                         }
                     }
